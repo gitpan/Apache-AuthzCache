@@ -1,4 +1,4 @@
-# $Id: AuthzCache.pm,v 1.7 2001/02/28 23:52:26 cgilmore Exp $
+# $Id: AuthzCache.pm,v 1.8 2001/05/29 16:21:35 cgilmore Exp $
 #
 # Author          : Christian Gilmore
 # Created On      : Fri Jun 23 10:15:36 CDT 2000
@@ -271,7 +271,7 @@ use String::ParseWords;
 
 
 # Global variables
-$Apache::AuthzCache::VERSION = '0.04';
+$Apache::AuthzCache::VERSION = '0.05';
 
 
 ###############################################################################
@@ -394,6 +394,7 @@ sub manage_cache {
   # Get username and group
   my $user_sent = $r->connection->user;
 
+  my ($group_sent, $cache_result) = undef;
   if ($mod_perl::VERSION < 1.26) {
     # I shouldn't need to use the below lines as this module
     # should never be called if there was a cache hit.  Since
@@ -403,8 +404,8 @@ sub manage_cache {
     # phase. I get the willies about the security implications in
     # a general environment where you might be using someone
     # else's handlers upstream or downstream...
-    my $group_sent = $r->subprocess_env("REMOTE_GROUP");
-    my $cache_result = $r->notes('AuthzCache');
+    $group_sent = $r->subprocess_env("REMOTE_GROUP");
+    $cache_result = $r->notes('AuthzCache');
     if ($group_sent && $cache_result eq 'hit') {
       $r->log->debug("manage_cache: upstream cache hit for ",
 		     "username=$user_sent, group=$group_sent");
@@ -542,6 +543,9 @@ modify it under the terms of the IBM Public License.
 ###############################################################################
 ###############################################################################
 # $Log: AuthzCache.pm,v $
+# Revision 1.8  2001/05/29 16:21:35  cgilmore
+# corrected strict syntax issue
+#
 # Revision 1.7  2001/02/28 23:52:26  cgilmore
 # added requirement for Apache::Log
 #
