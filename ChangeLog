@@ -1,9 +1,16 @@
+2001-02-28	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Added requirement that Apache::Log be imported. Oversight found
+	   by Rod Bloodgood.
+	o  Made release 0.04
+	
 2001-01-08	Christian Gilmore <cgilmore@tivoli.com>
 
 	o  Better handled pre-1.26 set_handlers bugs
+	o  Made release 0.03
 	
 2000-09-26	Christian Gilmore <cgilmore@tivoli.com>
 
 	o  Made first public release 0.02
 
-$Id: ChangeLog,v 1.2 2001/01/08 17:41:17 cgilmore Exp $
+$Id: ChangeLog,v 1.4 2001/02/28 23:52:13 cgilmore Exp $

@@ -1,4 +1,4 @@
-# $Id: AuthzCache.pm,v 1.6 2001/01/08 17:41:24 cgilmore Exp $
+# $Id: AuthzCache.pm,v 1.7 2001/02/28 23:52:26 cgilmore Exp $
 #
 # Author          : Christian Gilmore
 # Created On      : Fri Jun 23 10:15:36 CDT 2000
@@ -265,12 +265,13 @@ package Apache::AuthzCache;
 use strict;
 use mod_perl ();
 use Apache::Constants qw(OK AUTH_REQUIRED DECLINED DONE);
+use Apache::Log;
 use IPC::Cache;
 use String::ParseWords;
 
 
 # Global variables
-$Apache::AuthzCache::VERSION = '0.03';
+$Apache::AuthzCache::VERSION = '0.04';
 
 
 ###############################################################################
@@ -541,6 +542,9 @@ modify it under the terms of the IBM Public License.
 ###############################################################################
 ###############################################################################
 # $Log: AuthzCache.pm,v $
+# Revision 1.7  2001/02/28 23:52:26  cgilmore
+# added requirement for Apache::Log
+#
 # Revision 1.6  2001/01/08 17:41:24  cgilmore
 # Better handled pre-1.26 set_handlers bugs
 #
