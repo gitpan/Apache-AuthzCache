@@ -1,4 +1,4 @@
-# $Id: AuthzCache.pm,v 1.8 2001/05/29 16:21:35 cgilmore Exp $
+# $Id: AuthzCache.pm,v 1.9 2001/07/12 14:12:48 cgilmore Exp $
 #
 # Author          : Christian Gilmore
 # Created On      : Fri Jun 23 10:15:36 CDT 2000
@@ -271,7 +271,7 @@ use String::ParseWords;
 
 
 # Global variables
-$Apache::AuthzCache::VERSION = '0.05';
+$Apache::AuthzCache::VERSION = '0.06';
 
 
 ###############################################################################
@@ -329,7 +329,9 @@ sub handler {
 	if ($casesensitive eq 'off' &&
 	    lc($req_group) eq lc($user_group)) {
 	  # Password matches so end stage
-	  if ($mod_perl::VERSION < 1.26) {
+	  # The required patch was not introduced in 1.26. It is no longer
+	  # promised to be included in any timeframe. Commenting out.
+	  # if ($mod_perl::VERSION < 1.26) {
 	    # Since set_handlers() doesn't work properly until
 	    # 1.26 (according to Doug MacEachern) I have to work
 	    # around it by cobbling together cheat sheets for the
@@ -337,22 +339,24 @@ sub handler {
 	    # willies about the security implications in a
 	    # general environment where you might be using
 	    # someone else's handlers upstream or downstream...
-	    $r->log->debug("handler: user in cache and case-insensitive ",
-			   "groups $req_group and $user_group match; ",
-			   "returning OK and setting environment and notes");
-	    $r->subprocess_env(REMOTE_GROUP => $user_group);
-	    $r->notes('AuthzCache' => 'hit');
-	    return OK;
-	  } else {
-	    $r->log->debug("handler: user in cache and case-insensitive ",
-	   		   "groups $req_group and $user_group match; ",
-	  		   "returning OK and clearing PerlAuthzHandler");
-	    $r->set_handlers(PerlAuthzHandler => undef);
-	  }
+	  $r->log->debug("handler: user in cache and case-insensitive ",
+			 "groups $req_group and $user_group match; ",
+			 "returning OK and setting environment and notes");
+	  $r->subprocess_env(REMOTE_GROUP => $user_group);
+	  $r->notes('AuthzCache' => 'hit');
+	  return OK;
+	  # } else {
+	  #  $r->log->debug("handler: user in cache and case-insensitive ",
+	  # 		   "groups $req_group and $user_group match; ",
+	  #		   "returning OK and clearing PerlAuthzHandler");
+	  #  $r->set_handlers(PerlAuthzHandler => undef);
+	  #}
 	}
 	elsif ($req_group eq $user_group) {
 	  # Password matches so end stage
-	  if ($mod_perl::VERSION < 1.26) {
+	  # The required patch was not introduced in 1.26. It is no longer
+	  # promised to be included in any timeframe. Commenting out.
+	  # if ($mod_perl::VERSION < 1.26) {
 	    # Since set_handlers() doesn't work properly until
 	    # 1.26 (according to Doug MacEachern) I have to work
 	    # around it by cobbling together cheat sheets for the
@@ -360,18 +364,18 @@ sub handler {
 	    # willies about the security implications in a
 	    # general environment where you might be using
 	    # someone else's handlers upstream or downstream...
-	    $r->log->debug("handler: user in cache and case-insensitive ",
-			   "groups $req_group and $user_group match; ",
-			   "returning OK and setting environment and notes");
-	    $r->subprocess_env(REMOTE_GROUP => $user_group);
-	    $r->notes('AuthzCache' => 'hit');
-	    return OK;
-	  } else {
-	    $r->log->debug("handler: user in cache and case-insensitive ",
-	   		   "groups $req_group and $user_group match; ",
-	  		   "returning OK and clearing PerlAuthzHandler");
-	    $r->set_handlers(PerlAuthzHandler => undef);
-	  }
+	  $r->log->debug("handler: user in cache and case-insensitive ",
+			 "groups $req_group and $user_group match; ",
+			 "returning OK and setting environment and notes");
+	  $r->subprocess_env(REMOTE_GROUP => $user_group);
+	  $r->notes('AuthzCache' => 'hit');
+	  return OK;
+	  # } else {
+	  #  $r->log->debug("handler: user in cache and case-insensitive ",
+	  # 		   "groups $req_group and $user_group match; ",
+	  #		   "returning OK and clearing PerlAuthzHandler");
+	  #  $r->set_handlers(PerlAuthzHandler => undef);
+	  #}
 	}
       }
     }
@@ -395,7 +399,9 @@ sub manage_cache {
   my $user_sent = $r->connection->user;
 
   my ($group_sent, $cache_result) = undef;
-  if ($mod_perl::VERSION < 1.26) {
+  # The required patch was not introduced in 1.26. It is no longer
+  # promised to be included in any timeframe. Commenting out.
+  # if ($mod_perl::VERSION < 1.26) {
     # I shouldn't need to use the below lines as this module
     # should never be called if there was a cache hit.  Since
     # set_handlers() doesn't work properly until 1.26 (according
@@ -404,13 +410,13 @@ sub manage_cache {
     # phase. I get the willies about the security implications in
     # a general environment where you might be using someone
     # else's handlers upstream or downstream...
-    $group_sent = $r->subprocess_env("REMOTE_GROUP");
-    $cache_result = $r->notes('AuthzCache');
-    if ($group_sent && $cache_result eq 'hit') {
-      $r->log->debug("manage_cache: upstream cache hit for ",
-		     "username=$user_sent, group=$group_sent");
-      return OK;
-    }
+  $group_sent = $r->subprocess_env("REMOTE_GROUP");
+  $cache_result = $r->notes('AuthzCache');
+  if ($group_sent && $cache_result eq 'hit') {
+    $r->log->debug("manage_cache: upstream cache hit for ",
+		   "username=$user_sent, group=$group_sent");
+    return OK;
+  # }
   }
 
   # Get configuration
@@ -513,10 +519,8 @@ the REMOTE_GROUP environment variable with the group to which the
 user successfully was authorized.
 
 This module also has a workaround to the bugs in the
-set_handlers() method of mod_perl versions prior to 1.26. If
-mod_perl-1.26 or higher is detected, AuthzCache will use
-set_handlers to clear the downstream Authz handlers from the
-stack. Otherwise, it will write notes to downstream handlers.
+set_handlers() method of mod_perl-1.2x. It will write notes to
+downstream handlers.
 
 At the time of publication, the only primary authorization
 handler established to both set the REMOTE_GROUP and read the
@@ -543,6 +547,9 @@ modify it under the terms of the IBM Public License.
 ###############################################################################
 ###############################################################################
 # $Log: AuthzCache.pm,v $
+# Revision 1.9  2001/07/12 14:12:48  cgilmore
+# see ChangeLog
+#
 # Revision 1.8  2001/05/29 16:21:35  cgilmore
 # corrected strict syntax issue
 #

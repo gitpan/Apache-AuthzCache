@@ -1,20 +1,26 @@
+2001-07-12      Christian Gilmore <cgilmore@tivoli.com>
+
+        o  Removed test for mod_perl-1.26 or higher.
+        o  Cleaned up documentation.
+        o  Made release 0.06.
+
 2001-05-29	Christian Gilmore <cgilmore@tivoli.com>
         o  Bug fix on strict syntax error.
-	o  Made release 0.05
+	o  Made release 0.05.
 
 2001-02-28	Christian Gilmore <cgilmore@tivoli.com>
 
 	o  Added requirement that Apache::Log be imported. Oversight found
 	   by Rod Bloodgood.
-	o  Made release 0.04
+	o  Made release 0.04.
 	
 2001-01-08	Christian Gilmore <cgilmore@tivoli.com>
 
-	o  Better handled pre-1.26 set_handlers bugs
-	o  Made release 0.03
+	o  Better handled pre-1.26 set_handlers bugs.
+	o  Made release 0.03.
 	
 2000-09-26	Christian Gilmore <cgilmore@tivoli.com>
 
-	o  Made first public release 0.02
+	o  Made first public release 0.02.
 
-$Id: ChangeLog,v 1.5 2001/05/29 16:21:49 cgilmore Exp $
+$Id: ChangeLog,v 1.6 2001/07/12 14:12:48 cgilmore Exp $
