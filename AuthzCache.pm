@@ -1,4 +1,4 @@
-# $Id: AuthzCache.pm,v 1.5 2000/09/26 20:11:50 cgilmore Exp $
+# $Id: AuthzCache.pm,v 1.6 2001/01/08 17:41:24 cgilmore Exp $
 #
 # Author          : Christian Gilmore
 # Created On      : Fri Jun 23 10:15:36 CDT 2000
@@ -263,13 +263,14 @@ package Apache::AuthzCache;
 
 # Required libraries
 use strict;
+use mod_perl ();
 use Apache::Constants qw(OK AUTH_REQUIRED DECLINED DONE);
 use IPC::Cache;
 use String::ParseWords;
 
 
 # Global variables
-$Apache::AuthzCache::VERSION = '0.02';
+$Apache::AuthzCache::VERSION = '0.03';
 
 
 ###############################################################################
@@ -327,44 +328,49 @@ sub handler {
 	if ($casesensitive eq 'off' &&
 	    lc($req_group) eq lc($user_group)) {
 	  # Password matches so end stage
-	  $r->log->debug("handler: user in cache and case-insensitive ",
-			 "groups $req_group and $user_group match; ",
-			 "returning OK and setting environment and notes");
-	  # I should be able to use the below lines and be done with it.
-	  # Since set_handlers() and lookup_uri() don't work properly
-	  # (IMO), I have to work around it by cobbling together cheat
-	  # sheets for the subsequent handlers in this phase. I get the
-	  # willies about the security implications in a general
-	  # environment where you might be using someone else's handlers
-	  # upstream or downstream...
-	  # $r->log->debug("handler: user in cache and case-insensitive ",
-	  # 		   "groups $req_group and $user_group match; ",
-	  #		   "returning OK and clearing PerlAuthzHandler");
-	  # $r->set_handlers(PerlAuthzHandler => undef);
-
-	  $r->subprocess_env(REMOTE_GROUP => $user_group);
-	  $r->notes('AuthzCache' => 'hit');
-	  return OK;
+	  if ($mod_perl::VERSION < 1.26) {
+	    # Since set_handlers() doesn't work properly until
+	    # 1.26 (according to Doug MacEachern) I have to work
+	    # around it by cobbling together cheat sheets for the
+	    # subsequent handlers in this phase. I get the
+	    # willies about the security implications in a
+	    # general environment where you might be using
+	    # someone else's handlers upstream or downstream...
+	    $r->log->debug("handler: user in cache and case-insensitive ",
+			   "groups $req_group and $user_group match; ",
+			   "returning OK and setting environment and notes");
+	    $r->subprocess_env(REMOTE_GROUP => $user_group);
+	    $r->notes('AuthzCache' => 'hit');
+	    return OK;
+	  } else {
+	    $r->log->debug("handler: user in cache and case-insensitive ",
+	   		   "groups $req_group and $user_group match; ",
+	  		   "returning OK and clearing PerlAuthzHandler");
+	    $r->set_handlers(PerlAuthzHandler => undef);
+	  }
 	}
 	elsif ($req_group eq $user_group) {
 	  # Password matches so end stage
-	  $r->log->debug("handler: user in cache and case-insensitive ",
-			 "groups $req_group and $user_group match; ",
-			 "returning OK and setting environment and notes");
-	  # I should be able to use the below lines and be done with it.
-	  # Since set_handlers() and lookup_uri() don't work properly
-	  # (IMO), I have to work around it by cobbling together cheat
-	  # sheets for the subsequent handlers in this phase. I get the
-	  # willies about the security implications in a general
-	  # environment where you might be using someone else's handlers
-	  # upstream or downstream...
-	  # $r->log->debug("handler: user in cache and case-insensitive ",
-	  # 		   "groups $req_group and $user_group match; ",
-	  #		   "returning OK and clearing PerlAuthzHandler");
-	  # $r->set_handlers(PerlAuthzHandler => undef);
-	  $r->subprocess_env(REMOTE_GROUP => $user_group);
-	  $r->notes('AuthzCache' => 'hit');
-	  return OK;
+	  if ($mod_perl::VERSION < 1.26) {
+	    # Since set_handlers() doesn't work properly until
+	    # 1.26 (according to Doug MacEachern) I have to work
+	    # around it by cobbling together cheat sheets for the
+	    # subsequent handlers in this phase. I get the
+	    # willies about the security implications in a
+	    # general environment where you might be using
+	    # someone else's handlers upstream or downstream...
+	    $r->log->debug("handler: user in cache and case-insensitive ",
+			   "groups $req_group and $user_group match; ",
+			   "returning OK and setting environment and notes");
+	    $r->subprocess_env(REMOTE_GROUP => $user_group);
+	    $r->notes('AuthzCache' => 'hit');
+	    return OK;
+	  } else {
+	    $r->log->debug("handler: user in cache and case-insensitive ",
+	   		   "groups $req_group and $user_group match; ",
+	  		   "returning OK and clearing PerlAuthzHandler");
+	    $r->set_handlers(PerlAuthzHandler => undef);
+	  }
 	}
       }
     }
@@ -386,17 +392,23 @@ sub manage_cache {
 
   # Get username and group
   my $user_sent = $r->connection->user;
-  my $group_sent = $r->subprocess_env("REMOTE_GROUP");
-  $r->log->debug("manage_cache: username=$user_sent, group=$group_sent");
 
-  # The below test is dubious. I'm putting it in as a hack around the 
-  # problems with set_handlers not working quite right and lookup_uri() 
-  # not refilling the stack for subrequests
-  my $cache_result = $r->notes('AuthzCache');
-  if ($group_sent && $cache_result eq 'hit') {
-    $r->log->debug("manage_cache: upstream cache hit for ",
-		   "username=$user_sent, group=$group_sent");
-    return OK;
+  if ($mod_perl::VERSION < 1.26) {
+    # I shouldn't need to use the below lines as this module
+    # should never be called if there was a cache hit.  Since
+    # set_handlers() doesn't work properly until 1.26 (according
+    # to Doug MacEachern) I have to work around it by cobbling
+    # together cheat sheets for the previous handlers in this
+    # phase. I get the willies about the security implications in
+    # a general environment where you might be using someone
+    # else's handlers upstream or downstream...
+    my $group_sent = $r->subprocess_env("REMOTE_GROUP");
+    my $cache_result = $r->notes('AuthzCache');
+    if ($group_sent && $cache_result eq 'hit') {
+      $r->log->debug("manage_cache: upstream cache hit for ",
+		     "username=$user_sent, group=$group_sent");
+      return OK;
+    }
   }
 
   # Get configuration
@@ -518,7 +530,7 @@ httpd(8)
 
 =head1 COPYRIGHT
 
-Copyright (C) 2000, International Business Machines Corporation
+Copyright (C) 2001, International Business Machines Corporation
 and others. All Rights Reserved.
 
 This module is free software; you can redistribute it and/or
@@ -528,8 +540,10 @@ modify it under the terms of the IBM Public License.
 
 ###############################################################################
 ###############################################################################
-#
 # $Log: AuthzCache.pm,v $
+# Revision 1.6  2001/01/08 17:41:24  cgilmore
+# Better handled pre-1.26 set_handlers bugs
+#
 # Revision 1.5  2000/09/26 20:11:50  cgilmore
 # namespace to Apache from Tivoli. Added pod.
 #
