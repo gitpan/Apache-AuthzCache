@@ -1,4 +1,4 @@
-# $Id: AuthzCache.pm,v 1.15 2003/06/18 16:35:30 cgilmore Exp $
+# $Id: AuthzCache.pm,v 1.17 2003/06/19 14:40:46 cgilmore Exp $
 #
 # Author          : Christian Gilmore
 # Created On      : Fri Jun 23 10:15:36 CDT 2000
@@ -278,7 +278,7 @@ use constant REQUIRE_OPTS => { 'inagroup'     => 1,
 
 
 # Global variables
-$Apache::AuthzCache::VERSION = '1.00';
+$Apache::AuthzCache::VERSION = '1.01';
 
 
 ###############################################################################
@@ -497,7 +497,8 @@ sub manage_cache {
   }
 
   # Add groups to the cache
-  my @$groups = Text::ParseWords::parse_line('\s+', 0, $group_sent);
+  my $groups = []; # perl-5.8 chokes on declaring an array dereference
+  @$groups = Text::ParseWords::parse_line('\s+', 0, $group_sent);
   my $cache = Cache::FileCache->new({ namespace          => $auth_name,
 				      default_expires_in => $cache_time_limit,
 				      cache_root         => $cache_dir,
@@ -675,6 +676,12 @@ modify it under the terms of the IBM Public License.
 ###############################################################################
 ###############################################################################
 # $Log: AuthzCache.pm,v $
+# Revision 1.17  2003/06/19 14:40:46  cgilmore
+# upped version number
+#
+# Revision 1.16  2003/06/19 14:38:08  cgilmore
+# see ChangeLog
+#
 # Revision 1.15  2003/06/18 16:35:30  cgilmore
 # see ChangeLog
 #

@@ -1,3 +1,9 @@
+2003-06-19	Christian Gilmore <cag@us.ibm.com>
+
+	o  Altered declaration of an array reference to meet perl-5.8
+	   strict rules.
+	o  Made release 1.01.
+	
 2003-06-18	Christian Gilmore <cag@us.ibm.com>
 
 	o  Added placement of REMOTE_GROUP into request headers to assist
@@ -35,4 +41,4 @@
 
 	o  Made first public release 0.02.
 
-$Id: ChangeLog,v 1.8 2003/06/18 16:35:30 cgilmore Exp $
+$Id: ChangeLog,v 1.9 2003/06/19 14:38:08 cgilmore Exp $
