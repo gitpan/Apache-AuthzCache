@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 1.2 2001/02/28 23:50:23 cgilmore Exp $
+# $Id: Makefile.PL,v 1.2 2001/02/28 23:50:23 cgilmore Exp cgilmore $
 
 use strict;
 use Config qw(%Config);
@@ -10,7 +10,7 @@ WriteMakefile
    'VERSION_FROM' => 'AuthzCache.pm',
    'PREREQ_PM'    => { 'Apache' => '1.24',
 		       'Apache::Log' => '1.01',
-		       'IPC::Cache' => '0.02', 
-		       'String::ParseWords' => '0.1' },
+		       'Cache::Cache' => '1.01', 
+		       'Text::ParseWords' => '3.2' },
    'dist'         => { 'COMPRESS' => 'gzip -9f', 'SUFFIX' => 'gz', },
   );
